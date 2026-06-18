@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>东软环保公众监督平台管理系统 - NEPM系统管理员端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .prototype-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .screen-frame {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen-frame.login-frame {
+            width: 450px;
+            padding: 40px;
+        }
+
+        .screen-frame.admin-frame {
+            width: 1200px;
+            height: 700px;
+        }
+
+        .page-label {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* 登录页面 */
+        .login-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .login-form-admin .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .login-form-admin .form-label {
+            width: 80px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-form-admin .form-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .login-form-admin input {
+            width: 100%;
+            padding: 12px 40px 12px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .login-form-admin input:focus {
+            border-color: #40a9ff;
+            outline: none;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+
+        .btn-login-admin {
+            margin-left: 80px;
+            padding: 10px 30px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 管理后台框架 */
+        .admin-layout {
+            display: flex;
+            height: 100%;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            color: rgba(255,255,255,0.65);
+            padding: 0 20px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            color: white;
+        }
+
+        .menu-item.active {
+            background: #1890ff;
+            color: white;
+        }
+
+        .menu-item .icon {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .menu-group-title {
+            color: rgba(255,255,255,0.65);
+            padding: 12px 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .menu-group-title .icon {
+            margin-right: 10px;
+        }
+
+        .submenu {
+            background: #000c17;
+        }
+
+        .submenu-item {
+            color: rgba(255,255,255,0.65);
+            padding: 10px 20px 10px 50px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submenu-item:hover {
+            color: white;
+        }
+
+        .submenu-item.active {
+            color: white;
+            background: #1890ff;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+        }
+
+        /* 顶部导航 */
+        .header {
+            height: 64px;
+            background: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .header-left .logo {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* 内容区域 */
+        .content-wrapper {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .breadcrumb span {
+            color: #1890ff;
+        }
+
+        /* 筛选栏 */
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-item label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            min-width: 100px;
+        }
+
+        .btn-filter {
+            padding: 6px 16px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-search {
+            padding: 6px 16px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .status-filter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-blue { background: #1890ff; }
+        .dot-orange { background: #faad14; }
+
+        /* 数据表格 */
+        .data-table {
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #fafafa;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table tr:hover {
+            background: #fafafa;
+        }
+
+        .level-tag-table {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .level-1 { background: #52c41a; }
+        .level-2 { background: #95de64; }
+        .level-3 { background: #faad14; }
+        .level-4 { background: #ff4d4f; }
+        .level-5 { background: #722ed1; }
+        .level-6 { background: #eb2f96; }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 4px 10px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 16px;
+            gap: 8px;
+        }
+
+        .page-btn {
+            padding: 5px 12px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .page-btn.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* 详情页面 */
+        .detail-card {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .detail-title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .btn-back {
+            padding: 6px 16px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .detail-label-admin {
+            width: 140px;
+            font-size: 14px;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .detail-value-admin {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .tag-location {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e6f7ff;
+            color: #1890ff;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-right: 8px;
+        }
+
+        .tag-level {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #fff1f0;
+            color: #ff4d4f;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* 页脚 */
+        .footer {
+            height: 40px;
+            background: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+        }
+
+        .empty-illustration {
+            width: 400px;
+            height: 200px;
+            background: linear-gradient(180deg, #e6f7ff 0%, #f0f2f5 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .city-illustration {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .building-illus {
+            background: #bfbfbf;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tree-illus {
+            width: 20px;
+            height: 40px;
+            background: #52c41a;
+            border-radius: 50% 50% 0 0;
+            position: relative;
+        }
+
+        .tree-illus::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 15px;
+            background: #8b4513;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <!-- 管理员登录页面 -->
+        <div class="screen-frame login-frame">
+            <span class="page-label">管理员登录</span>
+            <h2 class="login-title">登录</h2>
+            <form class="login-form-admin">
+                <div class="form-row">
+                    <span class="form-label">登录编码</span>
+                    <div class="form-input-wrapper">
+                        <input type="text" value="administrator" placeholder="请输入登录编码">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <span class="form-label">登录密码</span>
+                    <div class="form-input-wrapper">
+                        <input type="password" value="•••" placeholder="请输入登录密码">
+                        <span class="password-toggle">👁</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button type="button" class="btn-login-admin">登录</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 系统主框架 - 首页 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">系统首页</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item active">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="empty-state">
+                            <div class="empty-illustration">
+                                <div class="city-illustration">
+                                    <div class="tree-illus" style="height: 30px;"></div>
+                                    <div class="building-illus" style="width: 30px; height: 60px;"></div>
+                                    <div class="building-illus" style="width: 25px; height: 80px;"></div>
+                                    <div class="building-illus" style="width: 35px; height: 50px;"></div>
+                                    <div class="building-illus" style="width: 28px; height: 70px;"></div>
+                                    <div class="tree-illus" style="height: 35px;"></div>
+                                    <div class="tree-illus" style="height: 25px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公众监督数据列表页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">公众监督数据列表</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item active">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            公众监督数据管理 / <span>公众监督数据列表</span>
+                        </div>
+
+                        <!-- 筛选栏 -->
+                        <div class="filter-bar">
+                            <div class="filter-item">
+                                <label>省区域</label>
+                                <select>
+                                    <option>全部</option>
+                                    <option>辽宁省</option>
+                                    <option>河北省</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>市区域</label>
+                                <select>
+                                    <option>全部</option>
+                                    <option>沈阳市</option>
+                                    <option>大连市</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>预估等级</label>
+                                <select>
+                                    <option>全部</option>
+                                    <option>一级</option>
+                                    <option>二级</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>反馈日期</label>
+                                <input type="text" placeholder="反馈日期">
+                            </div>
+                            <button class="btn-filter">清空</button>
+                            <button class="btn-search">查询</button>
+                            <div class="status-filter">
+                                <div class="status-item">
+                                    <span class="status-dot dot-blue"></span>
+                                    <span>未确认</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-dot dot-orange"></span>
+                                    <span>已确认</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 数据表格 -->
+                        <div class="data-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>反馈者姓名</th>
+                                        <th>所在省</th>
+                                        <th>所在市</th>
+                                        <th>预估污染等级</th>
+                                        <th>反馈日期</th>
+                                        <th>反馈时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>38</td>
+                                        <td>欧阳锋</td>
+                                        <td>辽宁省</td>
+                                        <td>大连市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-10-27</td>
+                                        <td>16:29:26</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>37</td>
+                                        <td>欧阳克</td>
+                                        <td>安徽省</td>
+                                        <td>合肥市</td>
+                                        <td><span class="level-tag-table level-5">重度污染(五)</span></td>
+                                        <td>2022-10-26</td>
+                                        <td>10:41:05</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>36</td>
+                                        <td>谭处端</td>
+                                        <td>江苏省</td>
+                                        <td>南京市</td>
+                                        <td><span class="level-tag-table level-6">严重污染(六)</span></td>
+                                        <td>2022-10-26</td>
+                                        <td>10:39:57</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>35</td>
+                                        <td>郭靖</td>
+                                        <td>山西省</td>
+                                        <td>太原市</td>
+                                        <td><span class="level-tag-table level-3">轻度污染(三)</span></td>
+                                        <td>2022-10-26</td>
+                                        <td>10:39:13</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>34</td>
+                                        <td>朱聪</td>
+                                        <td>上海市</td>
+                                        <td>上海市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-09-26</td>
+                                        <td>10:37:56</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>33</td>
+                                        <td>柯镇恶</td>
+                                        <td>河南省</td>
+                                        <td>郑州市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-09-26</td>
+                                        <td>10:36:56</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>32</td>
+                                        <td>梅超风</td>
+                                        <td>黑龙江省</td>
+                                        <td>哈尔滨市</td>
+                                        <td><span class="level-tag-table level-5">重度污染(五)</span></td>
+                                        <td>2022-09-26</td>
+                                        <td>10:35:12</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>31</td>
+                                        <td>柯镇恶</td>
+                                        <td>江苏省</td>
+                                        <td>南京市</td>
+                                        <td><span class="level-tag-table level-3">轻度污染(三)</span></td>
+                                        <td>2022-08-26</td>
+                                        <td>10:33:58</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>30</td>
+                                        <td>梅超风</td>
+                                        <td>浙江省</td>
+                                        <td>杭州市</td>
+                                        <td><span class="level-tag-table level-5">重度污染(五)</span></td>
+                                        <td>2022-08-26</td>
+                                        <td>10:32:34</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>29</td>
+                                        <td>杨康</td>
+                                        <td>山西省</td>
+                                        <td>太原市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-08-26</td>
+                                        <td>10:29:46</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                                <button class="action-btn">指派</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <button class="page-btn active">1</button>
+                                <button class="page-btn">2</button>
+                                <span class="page-info">Total 16</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公众监督数据详情页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">公众监督数据详情</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item active">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            公众监督数据管理 / 公众监督数据详情
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <span class="detail-title">公众监督数据详情</span>
+                                <button class="btn-back">返回</button>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label-admin">公众监督反馈信息编号</span>
+                                <span class="detail-value-admin">38</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">反馈者信息</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">欧阳锋</span>
+                                    <span class="tag-location">男</span>
+                                    <span class="tag-location">1982-11-12</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">反馈者联系电话</span>
+                                <span class="detail-value-admin">17345988896</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">反馈信息所在地址</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">辽宁省</span>
+                                    <span class="tag-location">大连市</span>
+                                    <span class="tag-location">甘井子区凌水街道文社区</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">反馈信息描述</span>
+                                <span class="detail-value-admin">月黑风高，空气浑浊，难道是杀人夜？</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">预估等级</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-level">四级 中度污染</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">反馈日期时间</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">2022-10-27</span>
+                                    <span style="margin-left: 20px;">16:29:26</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认AQI数据列表页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">确认AQI数据列表</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item active">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            确认AQI数据管理 / <span>确认AQI数据列表</span>
+                        </div>
+
+                        <!-- 筛选栏 -->
+                        <div class="filter-bar">
+                            <div class="filter-item">
+                                <label>省区域</label>
+                                <select>
+                                    <option>全部</option>
+                                    <option>辽宁省</option>
+                                    <option>河北省</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>市区域</label>
+                                <select>
+                                    <option>全部</option>
+                                    <option>沈阳市</option>
+                                    <option>大连市</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>确认日期</label>
+                                <input type="text" placeholder="确认日期">
+                            </div>
+                            <button class="btn-filter">清空</button>
+                            <button class="btn-search">查询</button>
+                        </div>
+
+                        <!-- 数据表格 -->
+                        <div class="data-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>所在省</th>
+                                        <th>所在市</th>
+                                        <th>AQI等级</th>
+                                        <th>确认日期</th>
+                                        <th>确认时间</th>
+                                        <th>网格员</th>
+                                        <th>反馈者</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>38</td>
+                                        <td>辽宁省</td>
+                                        <td>大连市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-10-27</td>
+                                        <td>17:01:52</td>
+                                        <td>徐晃</td>
+                                        <td>欧阳锋</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>37</td>
+                                        <td>浙江省</td>
+                                        <td>杭州市</td>
+                                        <td><span class="level-tag-table level-5">重度污染(五)</span></td>
+                                        <td>2022-08-26</td>
+                                        <td>13:29:25</td>
+                                        <td>谢锋</td>
+                                        <td>梅超风</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>36</td>
+                                        <td>浙江省</td>
+                                        <td>杭州市</td>
+                                        <td><span class="level-tag-table level-6">严重污染(六)</span></td>
+                                        <td>2022-10-26</td>
+                                        <td>13:28:50</td>
+                                        <td>夏侯渊</td>
+                                        <td>谭处端</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>35</td>
+                                        <td>江苏省</td>
+                                        <td>南京市</td>
+                                        <td><span class="level-tag-table level-3">轻度污染(三)</span></td>
+                                        <td>2022-09-26</td>
+                                        <td>13:28:09</td>
+                                        <td>夏侯惇</td>
+                                        <td>柯镇恶</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>34</td>
+                                        <td>辽宁省</td>
+                                        <td>沈阳市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-07-26</td>
+                                        <td>13:26:14</td>
+                                        <td>张辽</td>
+                                        <td>郭靖</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>33</td>
+                                        <td>辽宁省</td>
+                                        <td>大连市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-06-26</td>
+                                        <td>13:24:58</td>
+                                        <td>郭嘉</td>
+                                        <td>郭靖</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>32</td>
+                                        <td>辽宁省</td>
+                                        <td>沈阳市</td>
+                                        <td><span class="level-tag-table level-3">轻度污染(三)</span></td>
+                                        <td>2022-05-26</td>
+                                        <td>13:24:14</td>
+                                        <td>曹植</td>
+                                        <td>欧阳锋</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>31</td>
+                                        <td>河南省</td>
+                                        <td>郑州市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-04-26</td>
+                                        <td>13:23:20</td>
+                                        <td>曹丕</td>
+                                        <td>柯镇恶</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>30</td>
+                                        <td>河南省</td>
+                                        <td>郑州市</td>
+                                        <td><span class="level-tag-table level-5">重度污染(五)</span></td>
+                                        <td>2022-07-26</td>
+                                        <td>12:52:18</td>
+                                        <td>曹仁</td>
+                                        <td>全金发</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>29</td>
+                                        <td>河南省</td>
+                                        <td>郑州市</td>
+                                        <td><span class="level-tag-table level-4">中度污染(四)</span></td>
+                                        <td>2022-09-26</td>
+                                        <td>12:51:39</td>
+                                        <td>曹丕</td>
+                                        <td>柯镇恶</td>
+                                        <td>
+                                            <div class="action-btns">
+                                                <button class="action-btn">详情</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <button class="page-btn">1</button>
+                                <button class="page-btn active">2</button>
+                                <button class="page-btn">3</button>
+                                <button class="page-btn">4</button>
+                                <span class="page-info">Total 38</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认AQI数据详情页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">确认AQI数据详情</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item active">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            确认AQI数据管理 / 确认AQI数据详情
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <span class="detail-title">公众监督数据详情</span>
+                                <button class="btn-back">返回</button>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label-admin">确认AQI数据编号</span>
+                                <span class="detail-value-admin">38</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">确认信息所在地址</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">辽宁省</span>
+                                    <span class="tag-location">大连市</span>
+                                    <span class="tag-location">甘井子区凌水街道文社区</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">确认AQI等级</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-level">四级 中度污染</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">确认日期时间</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">2022-10-27</span>
+                                    <span style="margin-left: 20px;">17:01:52</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">网格员信息</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">徐晃</span>
+                                    <span style="margin-left: 10px;">13687964456</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">公众监督信息</span>
+                                <span class="detail-value-admin">
+                                    <span class="tag-location">欧阳锋</span>
+                                    <span style="margin-left: 10px;">17345988896</span>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">公众监督员反馈信息描述</span>
+                                <span class="detail-value-admin">月黑风高，空气浑浊，难道是杀人夜？</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 省分组检查统计页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">省分组检查统计</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item active">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            统计数据管理 / <span>省分组检查统计</span>
+                        </div>
+
+                        <div class="data-table">
+                            <div style="background: #52c41a; color: white; padding: 12px 16px; font-size: 14px; font-weight: 500;">
+                                省分组检查统计
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>省简称</th>
+                                        <th>省名称</th>
+                                        <th>SO2超标累计</th>
+                                        <th>CO超标累计</th>
+                                        <th>PM2.5超标累计</th>
+                                        <th>AQI超标累计</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>京</td>
+                                        <td>北京市</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>津</td>
+                                        <td>天津市</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>冀</td>
+                                        <td>河北省</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>晋</td>
+                                        <td>山西省</td>
+                                        <td>2</td>
+                                        <td>4</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>蒙</td>
+                                        <td>内蒙古</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>辽</td>
+                                        <td>辽宁省</td>
+                                        <td>4</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>吉</td>
+                                        <td>吉林省</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>黑</td>
+                                        <td>黑龙江省</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>沪</td>
+                                        <td>上海市</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>苏</td>
+                                        <td>江苏省</td>
+                                        <td>3</td>
+                                        <td>1</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>浙</td>
+                                        <td>浙江省</td>
+                                        <td>3</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>皖</td>
+                                        <td>安徽省</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>13</td>
+                                        <td>闽</td>
+                                        <td>福建省</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                        <td>2</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AQI指数分布统计页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">AQI指数分布统计</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item active">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            统计数据管理 / <span>AQI空气质量指数级别分布</span>
+                        </div>
+
+                        <div class="data-table">
+                            <div style="background: #52c41a; color: white; padding: 12px 16px; font-size: 14px; font-weight: 500;">
+                                AQI空气质量指数级别分布
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>AQI指数等级</th>
+                                        <th>AQI指数等级描述</th>
+                                        <th>AQI指数等级分布统计</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>优</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>良</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>轻度污染</td>
+                                        <td>8</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>中度污染</td>
+                                        <td>14</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>重度污染</td>
+                                        <td>9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>严重污染</td>
+                                        <td>6</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AQI指数趋势统计页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">AQI指数趋势统计</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item active">AQI指数趋势统计</div>
+                            <div class="submenu-item">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            统计数据管理 / <span>AQI空气质量指数超标趋势</span>
+                        </div>
+
+                        <div class="data-table">
+                            <div style="background: #52c41a; color: white; padding: 12px 16px; font-size: 14px; font-weight: 500;">
+                                AQI空气质量指数超标趋势
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>月份</th>
+                                        <th>AQI空气质量指数超标数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>2022-10</td>
+                                        <td>5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>2022-09</td>
+                                        <td>6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>2022-08</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>2022-07</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>2022-06</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>2022-05</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>2022-04</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>2022-03</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>2022-02</td>
+                                        <td>3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>2022-01</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>2021-12</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>2021-11</td>
+                                        <td>0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 其它数据统计页面 -->
+        <div class="screen-frame admin-frame">
+            <span class="page-label">其它数据统计</span>
+            <div class="admin-layout">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-menu">
+                        <div class="menu-group-title">
+                            <span class="icon">📊</span>
+                            <span>公众监督数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">公众监督数据列表</div>
+                            <div class="submenu-item">确认AQI数据列表</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">📈</span>
+                            <span>统计数据管理</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">省分组检查统计</div>
+                            <div class="submenu-item">AQI指数分布统计</div>
+                            <div class="submenu-item">AQI指数趋势统计</div>
+                            <div class="submenu-item active">其它数据统计</div>
+                        </div>
+                        <div class="menu-group-title">
+                            <span class="icon">🌐</span>
+                            <span>网格数据管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主内容区 -->
+                <div class="main-content">
+                    <!-- 顶部导航 -->
+                    <div class="header">
+                        <div class="header-left">
+                            <span class="logo">🌿</span>
+                            <span>东软环保公众监督平台管理系统</span>
+                        </div>
+                        <div class="header-right">
+                            <span>系统管理员: administrator</span>
+                            <button class="logout-btn">OUT ></button>
+                        </div>
+                    </div>
+
+                    <!-- 内容区域 -->
+                    <div class="content-wrapper">
+                        <div class="breadcrumb">
+                            统计数据管理 / <span>其它数据统计</span>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <span class="detail-title">其它数据统计</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label-admin">空气质量检测总数量</span>
+                                <span class="detail-value-admin">39</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">空气质量检测良好数量</span>
+                                <span class="detail-value-admin">2</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">省会城市网格覆盖范围</span>
+                                <span class="detail-value-admin">47.06%</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label-admin">大城市网格覆盖范围</span>
+                                <span class="detail-value-admin">16.04%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 页脚 -->
+                    <div class="footer">
+                        © 版权所有 东软睿道 www.neusoft.com
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

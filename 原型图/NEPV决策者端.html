@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>东软空气质量环保公众监督平台 - NEPV决策者端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #0a1628;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 150, 255, 0.3);
+        }
+
+        /* 顶部标题栏 */
+        .dashboard-header {
+            background: linear-gradient(90deg, #0d1b2a 0%, #1b3a4b 50%, #0d1b2a 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a9d8f;
+            position: relative;
+        }
+
+        .dashboard-header::before,
+        .dashboard-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 100px;
+            height: 2px;
+            background: #00d4ff;
+        }
+
+        .dashboard-header::before {
+            left: 20%;
+        }
+
+        .dashboard-header::after {
+            right: 20%;
+        }
+
+        .header-title {
+            font-size: 24px;
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            letter-spacing: 4px;
+        }
+
+        .header-time {
+            color: #7fb3d3;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-time::before {
+            content: '◷';
+            color: #00d4ff;
+        }
+
+        /* 主内容区 */
+        .dashboard-content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 340px;
+            gap: 20px;
+            min-height: 750px;
+        }
+
+        /* 面板样式 */
+        .panel-box {
+            background: rgba(13, 27, 42, 0.8);
+            border: 1px solid #2a9d8f;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .panel-box::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #00d4ff;
+        }
+
+        .panel-title {
+            color: #7fb3d3;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* 左侧面板 */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 仪表盘 */
+        .gauge-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gauge-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gauge {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        .gauge-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 180deg,
+                    #e63946 0deg 30deg,
+                    #f4a261 30deg 60deg,
+                    #e9c46a 60deg 90deg,
+                    #2a9d8f 90deg 180deg);
+            mask: radial-gradient(transparent 55%, black 56%);
+            -webkit-mask: radial-gradient(transparent 55%, black 56%);
+        }
+
+        .gauge-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #0d1b2a;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2a9d8f;
+        }
+
+        .gauge-label {
+            font-size: 10px;
+            color: #7fb3d3;
+        }
+
+        .gauge-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 38px;
+            background: #00d4ff;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%) rotate(-45deg);
+            box-shadow: 0 0 5px #00d4ff;
+        }
+
+        .gauge-needle::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #00d4ff;
+            border-radius: 50%;
+        }
+
+        /* 饼图 */
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .pie {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#e63946 0deg 72deg,
+                    #f4a261 72deg 144deg,
+                    #e9c46a 144deg 216deg,
+                    #2a9d8f 216deg 288deg,
+                    #457b9d 288deg 360deg);
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #7fb3d3;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* 折线图 */
+        .line-chart {
+            height: 100px;
+            position: relative;
+            padding: 5px;
+        }
+
+        .line-chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 中间地图区域 - 优化后 */
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 10px;
+        }
+
+        .china-map-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .china-map {
+            width: 100%;
+            max-width: 700px;
+            height: 550px;
+            position: relative;
+        }
+
+        /* SVG 中国地图 */
+        .map-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .province-path {
+            stroke: #1b3a4b;
+            stroke-width: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .province-path:hover {
+            stroke: #00d4ff;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+            transform: scale(1.02);
+            transform-origin: center;
+        }
+
+        /* 各省颜色 - 根据AQI等级 */
+        .level-excellent {
+            fill: #2a9d8f;
+        }
+
+        .level-good {
+            fill: #457b9d;
+        }
+
+        .level-mild {
+            fill: #e9c46a;
+        }
+
+        .level-moderate {
+            fill: #f4a261;
+        }
+
+        .level-severe {
+            fill: #e63946;
+        }
+
+        .level-serious {
+            fill: #9d4edd;
+        }
+
+        /* 地图装饰效果 */
+        .map-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 90%;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* 地图图例 */
+        .map-legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(13, 27, 42, 0.9);
+            border: 1px solid #2a9d8f;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .map-legend-title {
+            color: #00d4ff;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #7fb3d3;
+        }
+
+        .map-legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* 地图标签 */
+        .province-label {
+            font-size: 10px;
+            fill: rgba(255, 255, 255, 0.9);
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 500;
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 柱状图 */
+        .bar-chart {
+            height: 110px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 5px 20px 5px;
+            border-bottom: 1px solid #2a9d8f;
+            position: relative;
+        }
+
+        .bar-chart::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 20px;
+            width: 1px;
+            background: #2a9d8f;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .bar {
+            width: 10px;
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s;
+        }
+
+        .bar:hover {
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .bar-label {
+            font-size: 9px;
+            color: #7fb3d3;
+            white-space: nowrap;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1400px) {
+            .dashboard-content {
+                grid-template-columns: 260px 1fr 300px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+
+            .center-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- 顶部标题栏 -->
+        <div class="dashboard-header">
+            <div class="header-title">东软空气质量环保公众监督平台</div>
+            <div class="header-time">2022-10-03 12:36:32</div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="dashboard-content">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <!-- 仪表盘 -->
+                <div class="panel-box">
+                    <div class="gauge-row">
+                        <div class="gauge-container">
+                            <div class="panel-title" style="font-size: 11px; margin-bottom: 8px;">省会城市网格覆盖率(%)</div>
+                            <div class="gauge">
+                                <div class="gauge-bg"></div>
+                                <div class="gauge-needle"></div>
+                                <div class="gauge-inner">
+                                    <div class="gauge-value">47</div>
+                                    <div class="gauge-label">%</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="panel-title" style="font-size: 11px; margin-bottom: 8px;">大城市网格覆盖率(%)</div>
+                            <div class="gauge">
+                                <div class="gauge-bg"></div>
+                                <div class="gauge-needle" style="transform: translate(-50%, -100%) rotate(-75deg);">
+                                </div>
+                                <div class="gauge-inner">
+                                    <div class="gauge-value" style="color: #e63946;">16</div>
+                                    <div class="gauge-label">%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 饼图 -->
+                <div class="panel-box">
+                    <div class="panel-title">空气质量指数级别分布</div>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart">
+                            <div class="pie"></div>
+                        </div>
+                        <div class="pie-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #2a9d8f;"></div>
+                                <span>优</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #457b9d;"></div>
+                                <span>良</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #e9c46a;"></div>
+                                <span>轻度</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f4a261;"></div>
+                                <span>中度</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #e63946;"></div>
+                                <span>重度</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9d4edd;"></div>
+                                <span>严重</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 折线图 -->
+                <div class="panel-box">
+                    <div class="panel-title">12个月内空气质量超标趋势</div>
+                    <div class="line-chart">
+                        <svg class="line-chart-svg" viewBox="0 0 240 100" preserveAspectRatio="none">
+                            <!-- 网格线 -->
+                            <line x1="0" y1="20" x2="240" y2="20" stroke="#1b3a4b" stroke-width="1" />
+                            <line x1="0" y1="40" x2="240" y2="40" stroke="#1b3a4b" stroke-width="1" />
+                            <line x1="0" y1="60" x2="240" y2="60" stroke="#1b3a4b" stroke-width="1" />
+                            <line x1="0" y1="80" x2="240" y2="80" stroke="#1b3a4b" stroke-width="1" />
+
+                            <!-- 折线 -->
+                            <polyline fill="none" stroke="#00d4ff" stroke-width="2"
+                                points="10,80 30,75 50,70 70,65 90,60 110,55 130,50 150,45 170,40 190,35 210,30 230,20" />
+
+                            <!-- 数据点 -->
+                            <circle cx="10" cy="80" r="3" fill="#00d4ff" />
+                            <circle cx="30" cy="75" r="3" fill="#00d4ff" />
+                            <circle cx="50" cy="70" r="3" fill="#00d4ff" />
+                            <circle cx="70" cy="65" r="3" fill="#00d4ff" />
+                            <circle cx="90" cy="60" r="3" fill="#00d4ff" />
+                            <circle cx="110" cy="55" r="3" fill="#00d4ff" />
+                            <circle cx="130" cy="50" r="3" fill="#00d4ff" />
+                            <circle cx="150" cy="45" r="3" fill="#00d4ff" />
+                            <circle cx="170" cy="40" r="3" fill="#00d4ff" />
+                            <circle cx="190" cy="35" r="3" fill="#00d4ff" />
+                            <circle cx="210" cy="30" r="3" fill="#00d4ff" />
+                            <circle cx="230" cy="20" r="3" fill="#00d4ff" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中间地图区域 - 使用ECharts绘制中国地图 -->
+            <div class="center-panel">
+                <div class="china-map-wrapper">
+                    <div class="map-glow"></div>
+                    <div class="china-map" id="chinaMap"></div>
+
+                    <!-- 地图图例 -->
+                    <div class="map-legend">
+                        <div class="map-legend-title">AQI等级</div>
+                        <div class="map-legend-item">
+                            <div class="map-legend-color" style="background: #e63946;"></div>
+                            <span>严重污染</span>
+                        </div>
+                        <div class="map-legend-item">
+                            <div class="map-legend-color" style="background: #f4a261;"></div>
+                            <span>重度污染</span>
+                        </div>
+                        <div class="map-legend-item">
+                            <div class="map-legend-color" style="background: #e9c46a;"></div>
+                            <span>中度污染</span>
+                        </div>
+                        <div class="map-legend-item">
+                            <div class="map-legend-color" style="background: #2a9d8f;"></div>
+                            <span>轻度污染</span>
+                        </div>
+                        <div class="map-legend-item">
+                            <div class="map-legend-color" style="background: #457b9d;"></div>
+                            <span>良</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧面板 -->
+            <div class="right-panel">
+                <!-- PM2.5柱状图 -->
+                <div class="panel-box">
+                    <div class="panel-title">悬浮颗粒物(PM2.5)浓度超标累计</div>
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 25px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">京</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 35px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">津</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 30px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">冀</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 85px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">晋</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 40px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">蒙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 50px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">辽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 95px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">吉</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 60px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">黑</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 75px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">沪</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 65px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">苏</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 45px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">浙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 55px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">皖</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 40px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">闽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 80px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">赣</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 70px; background: linear-gradient(180deg, #00d4ff 0%, #0077b6 100%);">
+                            </div>
+                            <div class="bar-label">鲁</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SO2柱状图 -->
+                <div class="panel-box">
+                    <div class="panel-title">二氧化硫(SO2)浓度超标累计</div>
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 35px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">京</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 50px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">津</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 30px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">冀</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 90px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">晋</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 45px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">蒙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 60px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">辽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 100px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">吉</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 65px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">黑</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 80px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">沪</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 70px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">苏</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 50px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">浙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 60px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">皖</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 45px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">闽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 85px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">赣</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 75px; background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);">
+                            </div>
+                            <div class="bar-label">鲁</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CO柱状图 -->
+                <div class="panel-box">
+                    <div class="panel-title">一氧化碳(CO)浓度超标累计</div>
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 40px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">京</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 55px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">津</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 35px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">冀</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 95px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">晋</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 50px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">蒙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 65px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">辽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 105px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">吉</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 70px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">黑</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 85px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">沪</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 75px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">苏</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 55px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">浙</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 65px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">皖</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 50px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">闽</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 90px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">赣</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar"
+                                style="height: 80px; background: linear-gradient(180deg, #ff7875 0%, #f5222d 100%);">
+                            </div>
+                            <div class="bar-label">鲁</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- 引入中国地图 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/js/china.js"></script>
+
+    <script>
+        // 初始化地图
+        var mapChart = echarts.init(document.getElementById('chinaMap'));
+
+        // 模拟数据 - 各省份AQI等级
+        var mapData = [
+            { name: '北京', value: 4 },
+            { name: '天津', value: 3 },
+            { name: '河北', value: 3 },
+            { name: '山西', value: 2 },
+            { name: '内蒙古', value: 2 },
+            { name: '辽宁', value: 4 },
+            { name: '吉林', value: 3 },
+            { name: '黑龙江', value: 4 },
+            { name: '上海', value: 2 },
+            { name: '江苏', value: 3 },
+            { name: '浙江', value: 2 },
+            { name: '安徽', value: 2 },
+            { name: '福建', value: 1 },
+            { name: '江西', value: 1 },
+            { name: '山东', value: 3 },
+            { name: '河南', value: 3 },
+            { name: '湖北', value: 2 },
+            { name: '湖南', value: 1 },
+            { name: '广东', value: 1 },
+            { name: '广西', value: 1 },
+            { name: '海南', value: 1 },
+            { name: '重庆', value: 2 },
+            { name: '四川', value: 2 },
+            { name: '贵州', value: 1 },
+            { name: '云南', value: 1 },
+            { name: '西藏', value: 0 },
+            { name: '陕西', value: 2 },
+            { name: '甘肃', value: 2 },
+            { name: '青海', value: 0 },
+            { name: '宁夏', value: 2 },
+            { name: '新疆', value: 0 },
+            { name: '台湾', value: 1 }
+        ];
+
+        var mapOption = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'item',
+                backgroundColor: 'rgba(13, 27, 42, 0.9)',
+                borderColor: '#2a9d8f',
+                borderWidth: 1,
+                textStyle: {
+                    color: '#fff'
+                },
+                formatter: function (params) {
+                    var levelNames = ['优', '良', '轻度污染', '中度污染', '重度污染', '严重污染'];
+                    return params.name + '<br/>AQI等级: ' + levelNames[params.value] || '暂无数据';
+                }
+            },
+            visualMap: {
+                show: false,
+                min: 0,
+                max: 5,
+                left: 'left',
+                top: 'bottom',
+                text: ['高', '低'],
+                calculable: true,
+                inRange: {
+                    color: ['#457b9d', '#2a9d8f', '#e9c46a', '#f4a261', '#e63946', '#9d4edd']
+                }
+            },
+            series: [
+                {
+                    name: 'AQI等级',
+                    type: 'map',
+                    map: 'china',
+                    roam: true,
+                    zoom: 1.2,
+                    label: {
+                        show: true,
+                        color: '#fff',
+                        fontSize: 10
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            color: '#fff',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        },
+                        itemStyle: {
+                            areaColor: '#00d4ff',
+                            shadowBlur: 20,
+                            shadowColor: 'rgba(0, 212, 255, 0.5)'
+                        }
+                    },
+                    itemStyle: {
+                        borderColor: '#1b3a4b',
+                        borderWidth: 1,
+                        areaColor: '#0d1b2a'
+                    },
+                    data: mapData
+                }
+            ]
+        };
+
+        mapChart.setOption(mapOption);
+
+        // 响应式
+        window.addEventListener('resize', function () {
+            mapChart.resize();
+        });
+    </script>
+</body>
+
+</html>
