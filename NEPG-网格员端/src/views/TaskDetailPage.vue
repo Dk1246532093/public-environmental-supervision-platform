@@ -61,25 +61,25 @@
           <label>SO₂浓度</label>
           <input type="text" v-model="measureData.so2" placeholder="请输入SO₂浓度">
           <span class="unit">ug/m³</span>
-          <span class="level-tag level-1">一</span>
+          <span :class="['level-tag', `level-${so2Level}`]">{{ levelTextMap[so2Level] }}</span>
         </div>
         <div class="input-measure">
           <label>CO浓度</label>
           <input type="text" v-model="measureData.co" placeholder="请输入CO浓度">
           <span class="unit">ug/m³</span>
-          <span class="level-tag level-1">一</span>
+          <span :class="['level-tag', `level-${coLevel}`]">{{ levelTextMap[coLevel] }}</span>
         </div>
         <div class="input-measure">
           <label>PM2.5浓度</label>
           <input type="text" v-model="measureData.pm25" placeholder="请输入PM2.5浓度">
           <span class="unit">ug/m³</span>
-          <span class="level-tag level-4">四</span>
+          <span :class="['level-tag', `level-${pm25Level}`]">{{ levelTextMap[pm25Level] }}</span>
         </div>
       </div>
 
       <!-- 结果展示 -->
-      <div class="result-banner">
-        空气质量等级: 四级 中度污染
+      <div class="result-banner" :style="{ background: aqiColor }">
+        空气质量等级: {{ levelTextMap[finalLevel] }}级 {{ aqiName }}
       </div>
 
       <!-- 提交按钮 -->
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-  import { reactive, ref, onMounted } from 'vue'
+  import { reactive, ref, computed, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { getAqiFeedbackById, updateAqiFeedbackState } from '@/api/feedback'
   import { saveStatistics } from '@/api/statistics'
@@ -140,6 +140,23 @@
     }
     return 1
   }
+
+  const so2Level = computed(() => measureData.so2 ? getLevel(Number(measureData.so2), 'so2') : 1)
+  const coLevel = computed(() => measureData.co ? getLevel(Number(measureData.co), 'co') : 1)
+  const pm25Level = computed(() => measureData.pm25 ? getLevel(Number(measureData.pm25), 'spm') : 1)
+  const finalLevel = computed(() => Math.max(so2Level.value, coLevel.value, pm25Level.value))
+  const aqiName = computed(() => aqiList.value.find((aqi: any) => aqi.aqiId === finalLevel.value)?.chineseExplain || '')
+  const aqiColor = computed(() => {
+    const colorMap: Record<number, string> = {
+      1: '#4caf50',
+      2: '#8bc34a',
+      3: '#ff9800',
+      4: '#f44336',
+      5: '#9c27b0',
+      6: '#795548'
+    }
+    return colorMap[finalLevel.value] || '#f44336'
+  })
 
   const loadAqiList = async () => {
     try {

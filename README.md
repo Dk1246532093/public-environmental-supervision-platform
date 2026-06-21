@@ -15,10 +15,10 @@
 东软环保公众监督平台/
 ├── backend/                  # Spring Boot 后端
 ├── NEPM-系统管理员端/        # Vue2 管理员后台
-├── NEPS公众监督员端/          # Vue3 移动端
-├── NEPG-网格员端/             # Vue3 移动端
-├── NEPV决策者端/              # Vue3 数据大屏
-└── 数据库/nep.sql             # 数据库初始化脚本
+├── NEPS-公众监督员端/        # Vue3 移动端
+├── NEPG-网格员端/            # Vue3 移动端
+├── NEPV-决策者端/            # Vue3 数据大屏
+└── 数据库/nep.sql            # 数据库初始化脚本
 ```
 
 ## 环境准备
@@ -64,7 +64,7 @@ npm run serve
 ### 公众监督员端
 
 ```bash
-cd NEPS公众监督员端
+cd NEPS-公众监督员端
 npm install
 npm run dev
 ```
@@ -82,7 +82,7 @@ npm run dev
 ### 决策者端
 
 ```bash
-cd NEPV决策者端
+cd NEPV-决策者端
 npm install
 npm run dev
 ```

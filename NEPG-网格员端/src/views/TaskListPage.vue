@@ -31,16 +31,22 @@
 
     <!-- 任务列表 -->
     <div class="task-list">
-      <div class="task-item" v-for="task in taskList" :key="task.id" @click="goToDetail(task.id)">
-        <div class="task-level" :class="`level-${task.level}`">{{ getLevelText(task.level) }}</div>
-        <div class="task-info">
-          <div class="task-location">{{ task.province }} {{ task.city }} {{ task.date }}</div>
-          <div class="task-address">{{ task.address }}</div>
+      <template v-if="taskList.length > 0">
+        <div class="task-item" v-for="task in taskList" :key="task.id" @click="goToDetail(task.id)">
+          <div class="task-level" :class="`level-${task.level}`">{{ getLevelText(task.level) }}</div>
+          <div class="task-info">
+            <div class="task-location">{{ task.province }} {{ task.city }} {{ task.date }}</div>
+            <div class="task-address">{{ task.address }}</div>
+          </div>
+          <div class="task-action">
+            <span>去检测</span>
+            <span>🔍</span>
+          </div>
         </div>
-        <div class="task-action">
-          <span>去检测</span>
-          <span>🔍</span>
-        </div>
+      </template>
+      <div v-else class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">暂无反馈任务</div>
       </div>
     </div>
   </div>
@@ -381,5 +387,25 @@
     gap: 4px;
     color: #2196f3;
     font-size: 14px;
+  }
+
+  /* 空状态 */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+  }
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  .empty-text {
+    font-size: 15px;
+    color: #999;
   }
 </style>

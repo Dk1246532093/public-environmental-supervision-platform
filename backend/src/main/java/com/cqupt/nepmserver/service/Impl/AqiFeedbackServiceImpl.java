@@ -25,6 +25,10 @@ public class AqiFeedbackServiceImpl implements IAqiFeedbackService{
      */
     @Override
     public int saveAqiFeedback(AqiFeedback aqiFeedback) {
+        //新提交反馈默认为未指派状态
+        if (aqiFeedback.getState() == null) {
+            aqiFeedback.setState(0);
+        }
         //直接调用basemappper的insert方法
         return aqiFeedbackMapper.insert(aqiFeedback);
     }
